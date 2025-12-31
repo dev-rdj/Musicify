@@ -1,144 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Musicify</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --bg:#121212;
-  --panel:#181818;
-  --card:#1e1e1e;
-  --accent:#1db954;
-  --text:#ffffff;
-  --muted:#b3b3b3;
-}
-
+:root{--a:#0b0b14;--b:#161629;--c:#1db954;--d:#fff;--e:#9aa0b5}
 *{margin:0;padding:0;box-sizing:border-box}
-
-body{
-  font-family:Inter,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
-
-/* HEADER */
-header{
-  padding:18px;
-  text-align:center;
-  border-bottom:1px solid #222;
-}
-header h1{
-  font-size:1.6rem;
-  font-weight:700;
-}
-header p{
-  font-size:.8rem;
-  color:var(--muted);
-  margin-top:4px;
-}
-
-/* SEARCH */
-.search{
-  padding:16px;
-}
-.search input{
-  width:100%;
-  padding:14px 16px;
-  border-radius:8px;
-  border:none;
-  background:#2a2a2a;
-  color:white;
-  font-size:1rem;
-  outline:none;
-}
-
-/* LIST */
-.list{
-  padding:0 12px 140px;
-}
-.track{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  padding:10px;
-  border-radius:8px;
-  cursor:pointer;
-}
-.track:hover{
-  background:#2a2a2a;
-}
-.track img{
-  width:54px;
-  height:54px;
-  border-radius:6px;
-}
-.track .meta{
-  overflow:hidden;
-}
-.track h4{
-  font-size:.95rem;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.track p{
-  font-size:.75rem;
-  color:var(--muted);
-}
-
-/* PLAYER */
-.player{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  background:var(--panel);
-  border-top:1px solid #222;
-  padding:12px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.player img{
-  width:52px;
-  height:52px;
-  border-radius:6px;
-}
-.player .info{
-  flex:1;
-  overflow:hidden;
-}
-.player .info h4{
-  font-size:.9rem;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.player .info p{
-  font-size:.75rem;
-  color:var(--muted);
-}
-.controls button{
-  background:var(--accent);
-  border:none;
-  color:black;
-  font-size:1rem;
-  width:44px;
-  height:44px;
-  border-radius:50%;
-  cursor:pointer;
-}
-
-/* hide youtube */
-#yt{
-  width:0;
-  height:0;
-  opacity:0;
-}
+body{font-family:Inter,sans-serif;background:var(--a);color:var(--d)}
+header{padding:20px;text-align:center}
+header h1{font-size:1.8rem}
+header p{color:var(--e);font-size:.85rem}
+.search{padding:0 20px 20px}
+.search input{width:100%;padding:14px;border-radius:14px;border:none;background:#1a1a33;color:#fff}
+.list{padding:0 20px 120px}
+.song{display:flex;gap:14px;align-items:center;background:var(--b);padding:12px;border-radius:14px;margin-bottom:12px;cursor:pointer}
+.song img{width:56px;height:56px;border-radius:10px}
+.song h4{font-size:.95rem}
+.song p{font-size:.75rem;color:var(--e)}
+.player{position:fixed;bottom:0;left:0;right:0;background:#101020;border-top:1px solid #2a2750;padding:12px;display:flex;gap:12px}
+.player img{width:50px;height:50px;border-radius:10px}
+.i{flex:1}
+.i h4{font-size:.9rem}
+.i p{font-size:.75rem;color:var(--e)}
+.c button{background:var(--c);border:none;border-radius:50%;width:44px;height:44px;cursor:pointer}
+#yt{width:0;height:0;opacity:0}
 </style>
 </head>
 
@@ -150,19 +39,19 @@ header p{
 </header>
 
 <div class="search">
-  <input id="searchBox" placeholder="Search songs, artists..." />
+  <input id="xq" placeholder="Search music..." />
 </div>
 
-<div class="list" id="results"></div>
+<div class="list" id="xl"></div>
 
 <div class="player">
-  <img id="cover" src="">
-  <div class="info">
-    <h4 id="title">Nothing playing</h4>
-    <p id="artist">—</p>
+  <img id="xc">
+  <div class="i">
+    <h4 id="xt">Nothing playing</h4>
+    <p id="xa">—</p>
   </div>
-  <div class="controls">
-    <button onclick="toggle()">▶</button>
+  <div class="c">
+    <button onclick="_t()">💗</button>
   </div>
 </div>
 
@@ -170,59 +59,56 @@ header p{
 
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-/* === CONFIG === */
-const KEY = atob("QUl6YVN5RFVRdW5YTG5HN1hOZ0kxdW1KQnRVMEc1d3k0MExFY0NMaA==");
+(()=>{
 
-/* === PLAYER === */
-let player, playing=false;
+const _k=atob("QUl6YVN5RFVRdW5YTG5HN1hOZ0kxdW1KQnRVMEc1d3k0MExFY0NMaA==");
+let _p,_s=false;
 
-function onYouTubeIframeAPIReady(){
-  player = new YT.Player("yt",{playerVars:{controls:0}});
-}
+window.onYouTubeIframeAPIReady=()=>{
+  _p=new YT.Player("yt",{playerVars:{controls:0}});
+};
 
-function toggle(){
-  if(!player) return;
-  playing ? player.pauseVideo() : player.playVideo();
-  playing = !playing;
-}
+const _l=document.getElementById("xl");
+const _q=document.getElementById("xq");
 
-/* === SEARCH === */
-const box = document.getElementById("searchBox");
-const list = document.getElementById("results");
-
-box.addEventListener("keydown",e=>{
-  if(e.key==="Enter") search(box.value);
+_q.addEventListener("keydown",e=>{
+  if(e.key==="Enter") _f(_q.value);
 });
 
-async function search(q){
-  list.innerHTML="Searching...";
-  const res = await fetch(
-    `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=12&q=${encodeURIComponent(q)}&key=${KEY}`
+async function _f(v){
+  _l.innerHTML="Loading...";
+  const r=await fetch(
+    `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=10&q=${encodeURIComponent(v)}&key=${_k}`
   );
-  const data = await res.json();
-  list.innerHTML="";
-  data.items.forEach(v=>{
-    const t = document.createElement("div");
-    t.className="track";
-    t.innerHTML=`
-      <img src="${v.snippet.thumbnails.medium.url}">
-      <div class="meta">
-        <h4>${v.snippet.title}</h4>
-        <p>${v.snippet.channelTitle}</p>
-      </div>
-    `;
-    t.onclick=()=>play(v.id.videoId,v.snippet);
-    list.appendChild(t);
+  const j=await r.json();
+  _l.innerHTML="";
+  j.items.forEach(o=>{
+    const d=document.createElement("div");
+    d.className="song";
+    d.innerHTML=
+      `<img src="${o.snippet.thumbnails.medium.url}">
+       <div><h4>${o.snippet.title}</h4>
+       <p>${o.snippet.channelTitle}</p></div>`;
+    d.onclick=()=>_g(o.id.videoId,o.snippet);
+    _l.appendChild(d);
   });
 }
 
-function play(id,s){
-  cover.src = s.thumbnails.medium.url;
-  title.textContent = s.title;
-  artist.textContent = s.channelTitle;
-  player.loadVideoById(id);
-  playing = true;
+function _g(i,s){
+  xc.src=s.thumbnails.medium.url;
+  xt.textContent=s.title;
+  xa.textContent=s.channelTitle;
+  _p.loadVideoById(i);
+  _s=true;
 }
+
+window._t=()=>{
+  if(!_p)return;
+  _s?_p.pauseVideo():_p.playVideo();
+  _s=!_s;
+};
+
+})();
 </script>
 
 </body>
