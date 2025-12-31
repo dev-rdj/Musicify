@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Musicify</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
 :root{
@@ -22,37 +22,37 @@ body{
   color:var(--text);
 }
 header{
-  text-align:center;
   padding:20px;
+  text-align:center;
 }
-header h1{
-  font-size:1.8rem;
+header h1{font-size:1.8rem}
+header p{color:var(--muted);font-size:.85rem}
+
+.search{
+  padding:0 20px 20px;
 }
-header p{
-  color:var(--muted);
-  font-size:.85rem;
+.search input{
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  background:#1a1a33;
+  color:white;
+  font-size:1rem;
 }
 
-/* SONG LIST */
 .list{
-  padding:20px;
-  max-width:500px;
-  margin:auto;
+  padding:0 20px 120px;
 }
 .song{
   display:flex;
-  align-items:center;
   gap:14px;
+  align-items:center;
   background:var(--card);
   padding:12px;
   border-radius:14px;
   margin-bottom:12px;
   cursor:pointer;
-  transition:.2s;
-}
-.song:hover{background:#1e1e38}
-.song.active{
-  outline:2px solid var(--accent);
 }
 .song img{
   width:56px;
@@ -62,7 +62,6 @@ header p{
 .song h4{font-size:.95rem}
 .song p{font-size:.75rem;color:var(--muted)}
 
-/* PLAYER */
 .player{
   position:fixed;
   bottom:0;
@@ -80,15 +79,9 @@ header p{
   height:50px;
   border-radius:10px;
 }
-.info{
-  flex:1;
-}
+.info{flex:1}
 .info h4{font-size:.9rem}
 .info p{font-size:.75rem;color:var(--muted)}
-.controls{
-  display:flex;
-  gap:10px;
-}
 .controls button{
   background:var(--accent);
   border:none;
@@ -99,10 +92,8 @@ header p{
   cursor:pointer;
 }
 
-/* Hide YouTube */
-#yt{
-  width:0;height:0;opacity:0;pointer-events:none;
-}
+/* hide youtube */
+#yt{width:0;height:0;opacity:0}
 </style>
 </head>
 
@@ -110,21 +101,23 @@ header p{
 
 <header>
   <h1>🎧 Musicify</h1>
-  <p>• Made by Jeff ❤️</p>
+  <p>Search & play music • Powered by YouTube • Made by Jeff ❤️</p>
 </header>
 
+<div class="search">
+  <input id="q" placeholder="Search songs, artists, playlists..." />
+</div>
+
 <div class="list" id="list"></div>
-  
+
 <div class="player">
   <img id="cover">
   <div class="info">
-    <h4 id="now">Select a song</h4>
+    <h4 id="title">Nothing playing</h4>
     <p id="artist">—</p>
   </div>
   <div class="controls">
-    <button onclick="prev()">⏮</button>
     <button onclick="toggle()">▶</button>
-    <button onclick="next()">⏭</button>
   </div>
 </div>
 
@@ -132,42 +125,48 @@ header p{
 
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-const songs=[
-  {title:"Lo-Fi Beats",artist:"Chillhop",id:"jfKfPfyJRdk",img:"https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg"},
-  {title:"Deep Focus",artist:"Ambient",id:"5qap5aO4i9A",img:"https://i.ytimg.com/vi/5qap5aO4i9A/hqdefault.jpg"},
-  {title:"Late Night Coding",artist:"Lofi",id:"DWcJFNfaw9c",img:"https://i.ytimg.com/vi/DWcJFNfaw9c/hqdefault.jpg"},
-  {title:"Calm Piano",artist:"Relax",id:"lTRiuFIWV54",img:"https://i.ytimg.com/vi/lTRiuFIWV54/hqdefault.jpg"},
-  {title:"Synthwave Drive",artist:"Retro",id:"MVPTGNGiI-4",img:"https://i.ytimg.com/vi/MVPTGNGiI-4/hqdefault.jpg"}
-];
+const API_KEY = "AIzaSyDUQynXLn7XNgI1umJBtU0G5wy40LEcCLk"; // ← PASTE HERE
 
 let player;
-let index=0;
 let playing=false;
+
+function onYouTubeIframeAPIReady(){
+  player=new YT.Player("yt",{playerVars:{controls:0}});
+}
 
 const list=document.getElementById("list");
 
-songs.forEach((s,i)=>{
-  const d=document.createElement("div");
-  d.className="song";
-  d.innerHTML=`<img src="${s.img}">
-    <div><h4>${s.title}</h4><p>${s.artist}</p></div>`;
-  d.onclick=()=>play(i);
-  list.appendChild(d);
+document.getElementById("q").addEventListener("keydown",e=>{
+  if(e.key==="Enter") search(e.target.value);
 });
 
-function onYouTubeIframeAPIReady(){
-  player=new YT.Player("yt",{videoId:songs[0].id,playerVars:{controls:0}});
+async function search(query){
+  list.innerHTML="Searching...";
+  const res=await fetch(
+    `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=10&q=${encodeURIComponent(query)}&key=${API_KEY}`
+  );
+  const data=await res.json();
+  list.innerHTML="";
+  data.items.forEach(v=>{
+    const d=document.createElement("div");
+    d.className="song";
+    d.innerHTML=`
+      <img src="${v.snippet.thumbnails.medium.url}">
+      <div>
+        <h4>${v.snippet.title}</h4>
+        <p>${v.snippet.channelTitle}</p>
+      </div>
+    `;
+    d.onclick=()=>play(v.id.videoId,v.snippet);
+    list.appendChild(d);
+  });
 }
 
-function play(i){
-  index=i;
-  document.querySelectorAll(".song").forEach(e=>e.classList.remove("active"));
-  list.children[i].classList.add("active");
-  const s=songs[i];
-  document.getElementById("cover").src=s.img;
-  document.getElementById("now").textContent=s.title;
-  document.getElementById("artist").textContent=s.artist;
-  player.loadVideoById(s.id);
+function play(id,s){
+  document.getElementById("cover").src=s.thumbnails.medium.url;
+  document.getElementById("title").textContent=s.title;
+  document.getElementById("artist").textContent=s.channelTitle;
+  player.loadVideoById(id);
   playing=true;
 }
 
@@ -176,8 +175,6 @@ function toggle(){
   playing?player.pauseVideo():player.playVideo();
   playing=!playing;
 }
-function next(){play((index+1)%songs.length)}
-function prev(){play((index-1+songs.length)%songs.length)}
 </script>
 
 </body>
