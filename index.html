@@ -5,175 +5,140 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Musicify</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --bg:#0b0b14;
-  --card:#161629;
-  --accent:#1db954;
-  --text:#fff;
-  --muted:#9aa0b5;
+body {
+  margin:0;
+  font-family: Inter, sans-serif;
+  background:#121212;
+  color:white;
 }
-*{margin:0;padding:0;box-sizing:border-box}
-body{
-  font-family:Inter,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
-header{
-  padding:20px;
+header {
+  padding:16px;
   text-align:center;
 }
-header h1{font-size:1.8rem}
-header p{color:var(--muted);font-size:.85rem}
-
-.search{
-  padding:0 20px 20px;
-}
-.search input{
-  width:100%;
-  padding:14px;
-  border-radius:14px;
-  border:none;
-  background:#1a1a33;
-  color:white;
-  font-size:1rem;
-}
-
-.list{
-  padding:0 20px 120px;
-}
-.song{
-  display:flex;
-  gap:14px;
-  align-items:center;
-  background:var(--card);
+input {
+  width:90%;
   padding:12px;
-  border-radius:14px;
-  margin-bottom:12px;
+  border-radius:8px;
+  border:none;
+  background:#2a2a2a;
+  color:white;
+  font-size:16px;
+}
+.song {
+  display:flex;
+  gap:12px;
+  padding:12px;
   cursor:pointer;
 }
-.song img{
-  width:56px;
-  height:56px;
-  border-radius:10px;
+.song:hover { background:#1f1f1f; }
+.song img {
+  width:60px;
+  height:60px;
+  border-radius:8px;
 }
-.song h4{font-size:.95rem}
-.song p{font-size:.75rem;color:var(--muted)}
-
-.player{
+.player {
   position:fixed;
   bottom:0;
   left:0;
   right:0;
-  background:#101020;
-  border-top:1px solid #2a2750;
+  background:#181818;
   padding:12px;
   display:flex;
   align-items:center;
   gap:12px;
 }
-.player img{
-  width:50px;
-  height:50px;
-  border-radius:10px;
-}
-.info{flex:1}
-.info h4{font-size:.9rem}
-.info p{font-size:.75rem;color:var(--muted)}
-.controls button{
-  background:var(--accent);
+button {
+  background:#1db954;
   border:none;
-  border-radius:50%;
-  width:44px;
-  height:44px;
-  font-size:1rem;
+  padding:10px 16px;
+  border-radius:20px;
   cursor:pointer;
 }
-
-/* hide youtube */
-#yt{width:0;height:0;opacity:0}
+#yt { width:0; height:0; }
 </style>
 </head>
 
 <body>
 
 <header>
-  <h1>🎧 Musicify</h1>
-  <p>Search & play music • Powered by YouTube • Made by Jeff ❤️</p>
+  <h2>🎧 Musicify</h2>
+  <p>Made by Jeff ❤️</p>
+  <input id="search" placeholder="Search music and press Enter">
 </header>
 
-<div class="search">
-  <input id="q" placeholder="Search songs, artists, playlists..." />
-</div>
-
-<div class="list" id="list"></div>
+<div id="results"></div>
 
 <div class="player">
-  <img id="cover">
-  <div class="info">
-    <h4 id="title">Nothing playing</h4>
-    <p id="artist">—</p>
-  </div>
-  <div class="controls">
-    <button onclick="toggle()">▶</button>
-  </div>
+  <div id="now">Nothing playing</div>
+  <button onclick="toggle()">Play / Pause</button>
 </div>
 
 <div id="yt"></div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-const API_KEY = "YOUR_API_KEY_HERE"; // ← PASTE HERE
+const API_KEY = "AIzaSyDUQynXLn7XNgI1umJBtU0G5wy40LEcCLk";
 
 let player;
-let playing=false;
+let isReady = false;
 
-function onYouTubeIframeAPIReady(){
-  player=new YT.Player("yt",{playerVars:{controls:0}});
-}
-
-const list=document.getElementById("list");
-
-document.getElementById("q").addEventListener("keydown",e=>{
-  if(e.key==="Enter") search(e.target.value);
-});
-
-async function search(query){
-  list.innerHTML="Searching...";
-  const res=await fetch(
-    `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=10&q=${encodeURIComponent(query)}&key=${API_KEY}`
-  );
-  const data=await res.json();
-  list.innerHTML="";
-  data.items.forEach(v=>{
-    const d=document.createElement("div");
-    d.className="song";
-    d.innerHTML=`
-      <img src="${v.snippet.thumbnails.medium.url}">
-      <div>
-        <h4>${v.snippet.title}</h4>
-        <p>${v.snippet.channelTitle}</p>
-      </div>
-    `;
-    d.onclick=()=>play(v.id.videoId,v.snippet);
-    list.appendChild(d);
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player("yt", {
+    playerVars: { controls: 0, playsinline: 1 },
+    events: {
+      onReady: () => { isReady = true; }
+    }
   });
 }
 
-function play(id,s){
-  document.getElementById("cover").src=s.thumbnails.medium.url;
-  document.getElementById("title").textContent=s.title;
-  document.getElementById("artist").textContent=s.channelTitle;
-  player.loadVideoById(id);
-  playing=true;
+document.getElementById("search").addEventListener("keydown", e => {
+  if (e.key === "Enter") search(e.target.value);
+});
+
+async function search(q) {
+  const r = await fetch(
+    `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=5&q=${encodeURIComponent(q)}&key=${API_KEY}`
+  );
+  const d = await r.json();
+
+  const res = document.getElementById("results");
+  res.innerHTML = "";
+
+  d.items.forEach(v => {
+    const div = document.createElement("div");
+    div.className = "song";
+    div.innerHTML = `
+      <img src="${v.snippet.thumbnails.medium.url}">
+      <div>
+        <div>${v.snippet.title}</div>
+        <small>${v.snippet.channelTitle}</small>
+      </div>
+    `;
+    div.onclick = () => play(v.id.videoId, v.snippet.title);
+    res.appendChild(div);
+  });
 }
 
-function toggle(){
-  if(!player)return;
-  playing?player.pauseVideo():player.playVideo();
-  playing=!playing;
+function play(id, title) {
+  if (!isReady) return alert("Player not ready yet");
+  document.getElementById("now").textContent = title;
+  player.loadVideoById(id);
+  player.mute();        // required for mobile
+  player.playVideo();
+}
+
+function toggle() {
+  if (!player) return;
+  const state = player.getPlayerState();
+  if (state === YT.PlayerState.PLAYING) {
+    player.pauseVideo();
+  } else {
+    player.unMute();
+    player.playVideo();
+  }
 }
 </script>
 
