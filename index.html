@@ -9,11 +9,11 @@
 
 <style>
 :root{
-  --bg:#121212;
-  --card:#181818;
+  --bg:#0b0b14;
+  --card:#161629;
   --accent:#1db954;
   --text:#fff;
-  --muted:#b3b3b3;
+  --muted:#9aa0b5;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{
@@ -21,35 +21,26 @@ body{
   background:var(--bg);
   color:var(--text);
 }
-
-/* HEADER */
 header{
   padding:20px;
   text-align:center;
 }
-header h1{
-  font-size:1.8rem;
-}
-header p{
-  font-size:.85rem;
-  color:var(--muted);
-}
+header h1{font-size:1.8rem}
+header p{color:var(--muted);font-size:.85rem}
 
-/* SEARCH */
 .search{
-  padding:0 20px 16px;
+  padding:0 20px 20px;
 }
 .search input{
   width:100%;
   padding:14px;
-  border-radius:30px;
+  border-radius:14px;
   border:none;
-  background:#242424;
+  background:#1a1a33;
   color:white;
   font-size:1rem;
 }
 
-/* SONG LIST */
 .list{
   padding:0 20px 120px;
 }
@@ -57,70 +48,52 @@ header p{
   display:flex;
   gap:14px;
   align-items:center;
-  padding:10px;
-  border-radius:12px;
+  background:var(--card);
+  padding:12px;
+  border-radius:14px;
+  margin-bottom:12px;
   cursor:pointer;
-}
-.song:hover{
-  background:#1f1f1f;
 }
 .song img{
   width:56px;
   height:56px;
-  border-radius:8px;
+  border-radius:10px;
 }
-.song h4{
-  font-size:.95rem;
-}
-.song p{
-  font-size:.75rem;
-  color:var(--muted);
-}
+.song h4{font-size:.95rem}
+.song p{font-size:.75rem;color:var(--muted)}
 
-/* PLAYER */
 .player{
   position:fixed;
   bottom:0;
   left:0;
   right:0;
-  background:#181818;
-  border-top:1px solid #282828;
+  background:#101020;
+  border-top:1px solid #2a2750;
   padding:12px;
   display:flex;
   align-items:center;
   gap:12px;
 }
 .player img{
-  width:48px;
-  height:48px;
-  border-radius:8px;
+  width:50px;
+  height:50px;
+  border-radius:10px;
 }
-.info{
-  flex:1;
-}
-.info h4{
-  font-size:.9rem;
-}
-.info p{
-  font-size:.75rem;
-  color:var(--muted);
-}
+.info{flex:1}
+.info h4{font-size:.9rem}
+.info p{font-size:.75rem;color:var(--muted)}
 .controls button{
   background:var(--accent);
   border:none;
-  width:46px;
-  height:46px;
   border-radius:50%;
-  font-size:1.1rem;
+  width:44px;
+  height:44px;
+  font-size:1rem;
   cursor:pointer;
 }
 
-/* HIDE YOUTUBE */
-#yt{
-  width:0;
-  height:0;
-  opacity:0;
-}
+/* hide youtube */
+#yt{width:0;height:0;opacity:0}
 </style>
 </head>
 
@@ -128,11 +101,11 @@ header p{
 
 <header>
   <h1>🎧 Musicify</h1>
-  <p>Spotify-style music • Made by Jeff ❤️</p>
+  <p>Search & play music • Powered by YouTube • Made by Jeff ❤️</p>
 </header>
 
 <div class="search">
-  <input id="q" placeholder="Search songs, artists..." />
+  <input id="q" placeholder="Search songs, artists, playlists..." />
 </div>
 
 <div class="list" id="list"></div>
@@ -144,7 +117,7 @@ header p{
     <p id="artist">—</p>
   </div>
   <div class="controls">
-    <button onclick="toggle()">🥰</button>
+    <button onclick="toggle()">▶</button>
   </div>
 </div>
 
@@ -152,76 +125,55 @@ header p{
 
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-const API_KEY = ""AIzaSyDUQynXLn7XNgI1umJBtU0G5wy40LEcCLk";
+const API_KEY = "YOUR_API_KEY_HERE"; // ← PASTE HERE
 
 let player;
 let playing=false;
 
-const list = document.getElementById("list");
-const cover = document.getElementById("cover");
-const title = document.getElementById("title");
-const artist = document.getElementById("artist");
-
-/* YT PLAYER */
 function onYouTubeIframeAPIReady(){
-  player = new YT.Player("yt",{
-    playerVars:{controls:0,playsinline:1},
-    events:{
-      onReady:e=>e.target.mute()
-    }
-  });
+  player=new YT.Player("yt",{playerVars:{controls:0}});
 }
 
-/* SEARCH */
+const list=document.getElementById("list");
+
 document.getElementById("q").addEventListener("keydown",e=>{
   if(e.key==="Enter") search(e.target.value);
 });
 
-async function search(q){
+async function search(query){
   list.innerHTML="Searching...";
-  const res = await fetch(
-    `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=10&q=${encodeURIComponent(q)}&key=${API_KEY}`
+  const res=await fetch(
+    `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=10&q=${encodeURIComponent(query)}&key=${API_KEY}`
   );
-  const data = await res.json();
+  const data=await res.json();
   list.innerHTML="";
-
   data.items.forEach(v=>{
-    const el = document.createElement("div");
-    el.className="song";
-    el.innerHTML=`
+    const d=document.createElement("div");
+    d.className="song";
+    d.innerHTML=`
       <img src="${v.snippet.thumbnails.medium.url}">
       <div>
         <h4>${v.snippet.title}</h4>
         <p>${v.snippet.channelTitle}</p>
       </div>
     `;
-    el.onclick=()=>play(v.id.videoId,v.snippet);
-    list.appendChild(el);
+    d.onclick=()=>play(v.id.videoId,v.snippet);
+    list.appendChild(d);
   });
 }
 
-/* PLAY */
 function play(id,s){
-  cover.src = s.thumbnails.medium.url;
-  title.textContent = s.title;
-  artist.textContent = s.channelTitle;
-
+  document.getElementById("cover").src=s.thumbnails.medium.url;
+  document.getElementById("title").textContent=s.title;
+  document.getElementById("artist").textContent=s.channelTitle;
   player.loadVideoById(id);
-  player.mute();      // required
-  player.playVideo();
-  playing = true;
+  playing=true;
 }
 
-/* TOGGLE */
 function toggle(){
-  if(!player) return;
-
-  if(player.getPlayerState() === YT.PlayerState.PLAYING){
-    player.pauseVideo();
-  } else {
-    player.unMute();
-    player.playVideo();
-  }
+  if(!player)return;
+  playing?player.pauseVideo():player.playVideo();
+  playing=!playing;
 }
 </script>
 
