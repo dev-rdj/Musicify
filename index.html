@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JeffSpace Music</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0a0118;
+  --card: #15122b;
+  --accent: #1db954; /* Spotify green */
+  --text: #ffffff;
+  --muted: #a0aec0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Inter, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 420px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* HEADER */
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+header h1 {
+  font-size: 1.6rem;
+}
+
+header p {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* SONG LIST */
+.song {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.song:hover {
+  background: #1c1838;
+}
+
+.song.active {
+  outline: 2px solid var(--accent);
+}
+
+.song h4 {
+  font-size: 0.95rem;
+}
+
+.song p {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* PLAYER */
+.player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #0f0c20;
+  border-top: 1px solid #2a2750;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.player-info {
+  flex: 1;
+}
+
+.player-info h4 {
+  font-size: 0.9rem;
+}
+
+.player-info p {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+}
+
+.controls button {
+  background: var(--accent);
+  border: none;
+  color: #000;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* HIDE YOUTUBE PLAYER */
+#yt-player {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <header>
+    <h1>🎧 JeffSpace Music</h1>
+    <p>Spotify-style • Powered by YouTube • Made by Jeff ❤️</p>
+  </header>
+
+  <div id="song-list"></div>
+</div>
+
+<!-- PLAYER BAR -->
+<div class="player">
+  <div class="player-info">
+    <h4 id="now-title">Select a song</h4>
+    <p id="now-artist">—</p>
+  </div>
+
+  <div class="controls">
+    <button onclick="prevSong()">⏮</button>
+    <button onclick="togglePlay()">▶️</button>
+    <button onclick="nextSong()">⏭</button>
+  </div>
+</div>
+
+<!-- Hidden YouTube Player -->
+<div id="yt-player"></div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script>
+/* =========================
+   SONG DATA (EDIT FREELY)
+========================= */
+const songs = [
+  { title: "Lo-Fi Chill", artist: "YouTube Audio", id: "jfKfPfyJRdk" },
+  { title: "Deep Focus", artist: "Ambient Mix", id: "5qap5aO4i9A" },
+  { title: "Late Night Coding", artist: "Chillhop", id: "DWcJFNfaw9c" },
+  { title: "Calm Piano", artist: "Relax", id: "lTRiuFIWV54" },
+  { title: "Synthwave Drive", artist: "Retro", id: "MVPTGNGiI-4" }
+];
+
+let player;
+let currentIndex = 0;
+let isPlaying = false;
+
+/* =========================
+   BUILD SONG LIST
+========================= */
+const list = document.getElementById("song-list");
+
+songs.forEach((song, index) => {
+  const div = document.createElement("div");
+  div.className = "song";
+  div.innerHTML = `<h4>${song.title}</h4><p>${song.artist}</p>`;
+  div.onclick = () => playSong(index);
+  list.appendChild(div);
+});
+
+/* =========================
+   YOUTUBE PLAYER
+========================= */
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player("yt-player", {
+    height: "0",
+    width: "0",
+    videoId: songs[0].id,
+    playerVars: {
+      autoplay: 0,
+      controls: 0,
+      modestbranding: 1
+    }
+  });
+}
+
+/* =========================
+   CONTROLS
+========================= */
+function playSong(index) {
+  currentIndex = index;
+  const song = songs[index];
+
+  document.querySelectorAll(".song").forEach(s => s.class
