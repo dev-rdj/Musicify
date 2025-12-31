@@ -1,214 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JeffSpace Music</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Musicify</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --bg: #0a0118;
-  --card: #15122b;
-  --accent: #1db954; /* Spotify green */
-  --text: #ffffff;
-  --muted: #a0aec0;
+:root{
+  --bg:#0b0b14;
+  --card:#161629;
+  --accent:#1db954;
+  --text:#fff;
+  --muted:#9aa0b5;
 }
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:Inter,sans-serif;
+  background:var(--bg);
+  color:var(--text);
 }
-
-body {
-  font-family: Inter, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
+header{
+  text-align:center;
+  padding:20px;
 }
-
-.container {
-  max-width: 420px;
-  margin: auto;
-  padding: 20px;
+header h1{
+  font-size:1.8rem;
 }
-
-/* HEADER */
-header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-header h1 {
-  font-size: 1.6rem;
-}
-
-header p {
-  font-size: 0.8rem;
-  color: var(--muted);
+header p{
+  color:var(--muted);
+  font-size:.85rem;
 }
 
 /* SONG LIST */
-.song {
-  background: var(--card);
-  border-radius: 14px;
-  padding: 14px;
-  margin-bottom: 12px;
-  cursor: pointer;
-  transition: 0.2s;
+.list{
+  padding:20px;
+  max-width:500px;
+  margin:auto;
 }
-
-.song:hover {
-  background: #1c1838;
+.song{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  background:var(--card);
+  padding:12px;
+  border-radius:14px;
+  margin-bottom:12px;
+  cursor:pointer;
+  transition:.2s;
 }
-
-.song.active {
-  outline: 2px solid var(--accent);
+.song:hover{background:#1e1e38}
+.song.active{
+  outline:2px solid var(--accent);
 }
-
-.song h4 {
-  font-size: 0.95rem;
+.song img{
+  width:56px;
+  height:56px;
+  border-radius:10px;
 }
-
-.song p {
-  font-size: 0.75rem;
-  color: var(--muted);
-}
+.song h4{font-size:.95rem}
+.song p{font-size:.75rem;color:var(--muted)}
 
 /* PLAYER */
-.player {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #0f0c20;
-  border-top: 1px solid #2a2750;
-  padding: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.player{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#101020;
+  border-top:1px solid #2a2750;
+  padding:12px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.player img{
+  width:50px;
+  height:50px;
+  border-radius:10px;
+}
+.info{
+  flex:1;
+}
+.info h4{font-size:.9rem}
+.info p{font-size:.75rem;color:var(--muted)}
+.controls{
+  display:flex;
+  gap:10px;
+}
+.controls button{
+  background:var(--accent);
+  border:none;
+  border-radius:50%;
+  width:44px;
+  height:44px;
+  font-size:1rem;
+  cursor:pointer;
 }
 
-.player-info {
-  flex: 1;
-}
-
-.player-info h4 {
-  font-size: 0.9rem;
-}
-
-.player-info p {
-  font-size: 0.75rem;
-  color: var(--muted);
-}
-
-.controls {
-  display: flex;
-  gap: 10px;
-}
-
-.controls button {
-  background: var(--accent);
-  border: none;
-  color: #000;
-  font-size: 0.9rem;
-  padding: 10px 14px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-/* HIDE YOUTUBE PLAYER */
-#yt-player {
-  width: 0;
-  height: 0;
-  opacity: 0;
-  pointer-events: none;
+/* Hide YouTube */
+#yt{
+  width:0;height:0;opacity:0;pointer-events:none;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <header>
-    <h1>🎧 JeffSpace Music</h1>
-    <p>Spotify-style • Powered by YouTube • Made by Jeff ❤️</p>
-  </header>
+<header>
+  <h1>🎧 Musicify</h1>
+  <p>• Made by Jeff ❤️</p>
+</header>
 
-  <div id="song-list"></div>
-</div>
-
-<!-- PLAYER BAR -->
+<div class="list" id="list"></div>
+  
 <div class="player">
-  <div class="player-info">
-    <h4 id="now-title">Select a song</h4>
-    <p id="now-artist">—</p>
+  <img id="cover">
+  <div class="info">
+    <h4 id="now">Select a song</h4>
+    <p id="artist">—</p>
   </div>
-
   <div class="controls">
-    <button onclick="prevSong()">⏮</button>
-    <button onclick="togglePlay()">▶️</button>
-    <button onclick="nextSong()">⏭</button>
+    <button onclick="prev()">⏮</button>
+    <button onclick="toggle()">▶</button>
+    <button onclick="next()">⏭</button>
   </div>
 </div>
 
-<!-- Hidden YouTube Player -->
-<div id="yt-player"></div>
+<div id="yt"></div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
-
 <script>
-/* =========================
-   SONG DATA (EDIT FREELY)
-========================= */
-const songs = [
-  { title: "Lo-Fi Chill", artist: "YouTube Audio", id: "jfKfPfyJRdk" },
-  { title: "Deep Focus", artist: "Ambient Mix", id: "5qap5aO4i9A" },
-  { title: "Late Night Coding", artist: "Chillhop", id: "DWcJFNfaw9c" },
-  { title: "Calm Piano", artist: "Relax", id: "lTRiuFIWV54" },
-  { title: "Synthwave Drive", artist: "Retro", id: "MVPTGNGiI-4" }
+const songs=[
+  {title:"Lo-Fi Beats",artist:"Chillhop",id:"jfKfPfyJRdk",img:"https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg"},
+  {title:"Deep Focus",artist:"Ambient",id:"5qap5aO4i9A",img:"https://i.ytimg.com/vi/5qap5aO4i9A/hqdefault.jpg"},
+  {title:"Late Night Coding",artist:"Lofi",id:"DWcJFNfaw9c",img:"https://i.ytimg.com/vi/DWcJFNfaw9c/hqdefault.jpg"},
+  {title:"Calm Piano",artist:"Relax",id:"lTRiuFIWV54",img:"https://i.ytimg.com/vi/lTRiuFIWV54/hqdefault.jpg"},
+  {title:"Synthwave Drive",artist:"Retro",id:"MVPTGNGiI-4",img:"https://i.ytimg.com/vi/MVPTGNGiI-4/hqdefault.jpg"}
 ];
 
 let player;
-let currentIndex = 0;
-let isPlaying = false;
+let index=0;
+let playing=false;
 
-/* =========================
-   BUILD SONG LIST
-========================= */
-const list = document.getElementById("song-list");
+const list=document.getElementById("list");
 
-songs.forEach((song, index) => {
-  const div = document.createElement("div");
-  div.className = "song";
-  div.innerHTML = `<h4>${song.title}</h4><p>${song.artist}</p>`;
-  div.onclick = () => playSong(index);
-  list.appendChild(div);
+songs.forEach((s,i)=>{
+  const d=document.createElement("div");
+  d.className="song";
+  d.innerHTML=`<img src="${s.img}">
+    <div><h4>${s.title}</h4><p>${s.artist}</p></div>`;
+  d.onclick=()=>play(i);
+  list.appendChild(d);
 });
 
-/* =========================
-   YOUTUBE PLAYER
-========================= */
-function onYouTubeIframeAPIReady() {
-  player = new YT.Player("yt-player", {
-    height: "0",
-    width: "0",
-    videoId: songs[0].id,
-    playerVars: {
-      autoplay: 0,
-      controls: 0,
-      modestbranding: 1
-    }
-  });
+function onYouTubeIframeAPIReady(){
+  player=new YT.Player("yt",{videoId:songs[0].id,playerVars:{controls:0}});
 }
 
-/* =========================
-   CONTROLS
-========================= */
-function playSong(index) {
-  currentIndex = index;
-  const song = songs[index];
+function play(i){
+  index=i;
+  document.querySelectorAll(".song").forEach(e=>e.classList.remove("active"));
+  list.children[i].classList.add("active");
+  const s=songs[i];
+  document.getElementById("cover").src=s.img;
+  document.getElementById("now").textContent=s.title;
+  document.getElementById("artist").textContent=s.artist;
+  player.loadVideoById(s.id);
+  playing=true;
+}
 
-  document.querySelectorAll(".song").forEach(s => s.class
+function toggle(){
+  if(!player)return;
+  playing?player.pauseVideo():player.playVideo();
+  playing=!playing;
+}
+function next(){play((index+1)%songs.length)}
+function prev(){play((index-1+songs.length)%songs.length)}
+</script>
+
+</body>
+</html>
